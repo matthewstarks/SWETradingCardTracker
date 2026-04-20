@@ -1,9 +1,13 @@
+{/* Used Claude to debug integration of working and maintained vault */}
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, List, Layers, Clock } from 'lucide-react';
+import { Search, User, List, Clock } from 'lucide-react';
+import { useVault } from '../context/VaultContext';
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { totalCount } = useVault();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
@@ -21,18 +25,18 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         <Link to="/" className="nav-logo text-accent" style={{ fontSize: '1.8rem', letterSpacing: '1px', textTransform: 'uppercase', padding: '4px 0', textDecoration: 'none' }}>
-          <span style={{ fontWeight: '800' }}>TCG Cards</span>
+          <span style={{ fontWeight: '800' }}>CardIndex</span>
         </Link>
-        
+
         <div style={{ position: 'relative', flex: '0 1 400px' }}>
           <form onSubmit={handleSearch} className="search-bar" style={{ width: '100%', display: 'flex', zIndex: 100, position: 'relative' }}>
             <Search size={18} className="text-secondary" />
-            <input 
-              type="text" 
-              name="search" 
-              placeholder="Search cards, sets, or games..." 
+            <input
+              type="text"
+              name="search"
+              placeholder="Search cards, sets, or games..."
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={e => setSearchValue(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
             />
@@ -46,11 +50,9 @@ export default function Navbar() {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {recentSearches.map((s, i) => (
                   <li key={i}>
-                    <button 
-                      onClick={() => { setSearchValue(s); navigate(`/search?q=${s}`); }} 
-                      style={{ width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer', transition: 'background 0.2s' }}
-                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                      onMouseOut={(e) => e.currentTarget.style.background = 'none'}
+                    <button
+                      onClick={() => { setSearchValue(s); navigate(`/search?q=${s}`); }}
+                      style={{ width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer' }}
                     >
                       <Clock size={16} className="text-secondary" />
                       {s}
@@ -70,9 +72,11 @@ export default function Navbar() {
           <Link to="/list" className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '1.1rem' }}>
             <List size={20} />
             Vault
-            <div style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: '20px', fontSize: '14px', marginLeft: '6px', fontWeight: 'bold' }}>
-              3
-            </div>
+            {totalCount > 0 && (
+              <div style={{ background: 'rgba(255,255,255,0.25)', padding: '2px 8px', borderRadius: '20px', fontSize: '14px', marginLeft: '6px', fontWeight: 'bold', minWidth: '24px', textAlign: 'center' }}>
+                {totalCount}
+              </div>
+            )}
           </Link>
         </div>
       </div>
