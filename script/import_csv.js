@@ -3,6 +3,8 @@ import { getFirestore } from "firebase-admin/firestore";
 import fs from "fs";
 import csv from "csv-parser";
 
+//used chatgpt to help get syntax for firebase admin commands on csv uploaders
+
 const serviceAccount = JSON.parse(
   fs.readFileSync("./script/serviceAccountKey.json", "utf8"),
 );
