@@ -8,20 +8,34 @@ import { useVault } from '../context/VaultContext';
 // ── API helpers ──────────────────────────────────────────────────────────────
 
 async function fetchPokemon(query) {
-    const q = query ? `name:${query}*` : 'supertype:Pokémon';
-    const res = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(q)}&pageSize=100&orderBy=-set.releaseDate`);
+    const q = query ? `name:${query}*` : 'supertype:Pokémon set.series:"Scarlet & Violet"';
+    const res = await fetch(
+        `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(q)}&pageSize=100&orderBy=-cardmarket.prices.averageSellPrice`
+    );
     const data = await res.json();
-    return (data.data || []).map(c => ({
-        id: `pokemon-${c.id}`,
-        apiId: c.id,
-        name: c.name,
-        game: 'Pokémon',
-        gameId: 'pokemon',
-        type: c.supertype || 'Single Card',
-        price: c.cardmarket?.prices?.averageSellPrice || c.tcgplayer?.prices?.holofoil?.market || 9.99,
-        image: c.images?.small,
-        set: c.set?.name,
-    }));
+    return (data.data || []).map(c => {
+        const tcg = c.tcgplayer?.prices;
+        const price =
+            c.cardmarket?.prices?.averageSellPrice ||
+            tcg?.holofoil?.market ||
+            tcg?.reverseHolofoil?.market ||
+            tcg?.normal?.market ||
+            tcg?.['1stEditionHolofoil']?.market ||
+            tcg?.unlimitedHolofoil?.market ||
+            null;
+
+        return {
+            id: `pokemon-${c.id}`,
+            apiId: c.id,
+            name: c.name,
+            game: 'Pokémon',
+            gameId: 'pokemon',
+            type: c.supertype || 'Single Card',
+            price,
+            image: c.images?.small,
+            set: c.set?.name,
+        };
+    });
 }
 
 async function fetchMTG(query) {
@@ -44,8 +58,8 @@ async function fetchMTG(query) {
 
 async function fetchYGO(query) {
     const url = query
-        ? `https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=${encodeURIComponent(query)}&num=125&offset=0`
-        : `https://db.ygoprodeck.com/api/v7/cardinfo.php?sort=views&num=100&offset=0`;
+        ? `https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=${encodeURIComponent(query)}&num=100&offset=0`
+        : `https://db.ygoprodeck.com/api/v7/cardinfo.php?staple=yes&sort=name&num=100&offset=0`;
     const res = await fetch(url);
     const data = await res.json();
     return (data.data || []).map(c => ({
@@ -55,7 +69,9 @@ async function fetchYGO(query) {
         game: 'Yu-Gi-Oh!',
         gameId: 'yugioh',
         type: c.type || 'Single Card',
-        price: c.card_prices?.[0]?.tcgplayer_price ? parseFloat(c.card_prices[0].tcgplayer_price) : 1.99,
+        price: c.card_prices?.[0]?.tcgplayer_price
+            ? parseFloat(c.card_prices[0].tcgplayer_price)
+            : null,
         image: c.card_images?.[0]?.image_url_small,
         set: c.card_sets?.[0]?.set_name,
     }));
@@ -109,23 +125,23 @@ export default function Search() {
     };
 
     const loadResults = useCallback(async () => {
-        setLoading(true);
-        try {
-            const fetches = ALL_GAMES.map(g => {
-                if (g === 'pokemon') return fetchPokemon(query);
-                if (g === 'mtg') return fetchMTG(query);
-                if (g === 'yugioh') return fetchYGO(query);
-                return Promise.resolve([]);
-            });
-            const batches = await Promise.allSettled(fetches);
-            const all = batches.flatMap(b => b.status === 'fulfilled' ? b.value : []);
-            setAllResults(all);  // <-- store everything
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    }, [query]);
+    setLoading(true);
+    try {
+        const fetches = ALL_GAMES.map(g => {
+            if (g === 'pokemon') return fetchPokemon(query);
+            if (g === 'mtg') return fetchMTG(query);
+            if (g === 'yugioh') return fetchYGO(query);
+            return Promise.resolve([]);
+        });
+        const batches = await Promise.allSettled(fetches);
+        const all = batches.flatMap(b => b.status === 'fulfilled' ? b.value : []);
+        setAllResults(all);  // <-- store everything
+    } catch (e) {
+        console.error(e);
+    } finally {
+        setLoading(false);
+    }
+}, [query]);
 
     useEffect(() => { loadResults(); }, [loadResults]);
 
