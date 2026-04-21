@@ -19,7 +19,7 @@ export default function Navbar() {
     }
   };
 
-  const recentSearches = ['Charizard Base Set', 'Black Lotus', 'Booster Boxes'];
+  const recentSearches = ['Charizard', 'Black Lotus', 'Dark Magician'];
 
   return (
     <nav className="navbar">
@@ -45,7 +45,7 @@ export default function Navbar() {
           {isSearchFocused && (
             <div className="glass" style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0, padding: '16px 0', zIndex: 99, borderRadius: '12px' }}>
               <div style={{ padding: '0 16px', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase' }}>
-                Recent Searches
+                Recommended Searches
               </div>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {recentSearches.map((s, i) => (
