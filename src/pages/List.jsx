@@ -123,24 +123,38 @@ export default function ListPage() {
                             <span className="text-secondary" style={{ fontSize: '1.1rem' }}>Estimated Tax (8%)</span>
                             <span style={{ fontSize: '1.2rem' }}>${tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="flex-between mb-6 pb-6" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                            <span className="text-secondary" style={{ fontSize: '1.1rem' }}>Shipping</span>
-                            <span className="text-accent" style={{ fontSize: '1.1rem' }}>Calculated at checkout</span>
-                        </div>
                         <div className="flex-between mb-8">
                             <span style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>Total</span>
                             <span className="text-accent" style={{ fontSize: '2.2rem', fontWeight: '800' }}>
                                 ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </span>
                         </div>
-                        <button className="btn btn-primary" style={{ width: '100%', padding: '20px', fontSize: '1.2rem', letterSpacing: '1px' }}>
-                            Checkout
-                        </button>
-                        <Link to="/search" className="btn" style={{ width: '100%', padding: '16px', fontSize: '1rem', display: 'flex', justifyContent: 'center', marginTop: '12px' }}>
+                        <Link to="/search" className="btn" style={{ width: '100%', padding: '16px', fontSize: '1rem', display: 'flex', justifyContent: 'center'}}>
                             Continue Browsing
                         </Link>
                     </div>
                 </div>
+            </div>
+            <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', zIndex: 0, pointerEvents: 'none' }}>
+                <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                    <defs>
+                        <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#f59e0b" />
+                            <stop offset="50%" stopColor="#f97316" />
+                            <stop offset="100%" stopColor="#ef4444" />
+                        </linearGradient>
+                    </defs>
+                    <path
+                        fill="url(#waveGradient)"
+                        fillOpacity="0.15"
+                        d="M0,160 C360,260 1080,60 1440,160 L1440,320 L0,320 Z"
+                    />
+                    <path
+                        fill="url(#waveGradient)"
+                        fillOpacity="0.25"
+                        d="M0,200 C480,100 960,300 1440,200 L1440,320 L0,320 Z"
+                    />
+                </svg>
             </div>
         </div>
     );
