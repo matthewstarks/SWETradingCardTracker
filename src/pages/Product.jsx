@@ -17,7 +17,7 @@ async function fetchProductData(gameId, apiId) {
                 game: 'Pokémon',
                 gameId: 'pokemon',
                 apiId,
-                basePrice: c.cardmarket?.prices?.averageSellPrice || c.tcgplayer?.prices?.holofoil?.market || 9.99,
+                basePrice: c.cardmarket?.prices?.averageSellPrice ?? c.tcgplayer?.prices?.holofoil?.market ?? null,
                 type: c.supertype,
                 rarity: c.rarity || 'Unknown',
                 set: c.set?.name,
@@ -35,7 +35,7 @@ async function fetchProductData(gameId, apiId) {
                 game: 'Magic: The Gathering',
                 gameId: 'mtg',
                 apiId,
-                basePrice: c.prices?.usd ? parseFloat(c.prices.usd) : 4.99,
+                basePrice: c.prices?.usd != null ? parseFloat(c.prices.usd) : null,
                 type: c.type_line,
                 rarity: c.rarity ? c.rarity.charAt(0).toUpperCase() + c.rarity.slice(1) : 'Unknown',
                 set: c.set_name,
@@ -55,7 +55,7 @@ async function fetchProductData(gameId, apiId) {
                 game: 'Yu-Gi-Oh!',
                 gameId: 'yugioh',
                 apiId,
-                basePrice: c.card_prices?.[0]?.tcgplayer_price ? parseFloat(c.card_prices[0].tcgplayer_price) : 1.99,
+                basePrice: c.card_prices?.[0]?.tcgplayer_price ? parseFloat(c.card_prices[0].tcgplayer_price) : null,
                 type: c.type,
                 rarity: c.card_sets?.[0]?.set_rarity || 'Unknown',
                 set: c.card_sets?.[0]?.set_name || 'Unknown Set',
@@ -74,7 +74,7 @@ async function fetchProductData(gameId, apiId) {
         game: gameId,
         gameId,
         apiId,
-        basePrice: 9.99,
+        basePrice: null,
         type: 'Single Card',
         rarity: 'Rare',
         set: 'Base Set',
@@ -116,7 +116,7 @@ export default function Product() {
     }, [resolvedGame, resolvedId]);
 
     const getPrice = () => {
-        if (!product) return 0;
+        if (!product || product.basePrice == null) return null;
         return product.basePrice * (CONDITION_MULTIPLIERS[condition] ?? 1);
     };
 
@@ -129,7 +129,7 @@ export default function Product() {
             game: product.game,
             set: product.set,
             condition,
-            price: getPrice(),
+            price: getPrice() ?? null,
             quantity,
             image: product.image,
         });
@@ -249,7 +249,9 @@ export default function Product() {
                         <div className="flex-between mb-8">
                             <span className="text-secondary" style={{ fontSize: '1.2rem' }}>Current Market Value</span>
                             <span className="text-accent" style={{ fontSize: '2.5rem', fontWeight: '800' }}>
-                                ${(getPrice() * quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                {getPrice() != null
+                                    ? `$${(getPrice() * quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                                    : 'Price unavailable'}
                             </span>
                         </div>
 
