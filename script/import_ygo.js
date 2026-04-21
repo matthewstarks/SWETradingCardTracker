@@ -27,7 +27,7 @@ fs.createReadStream("./script/ygo_card_price_data.csv")
     let count = 0;
 
     for (const row of results) {
-      const docRef = firestore.collection("ygo_cards").doc(); // auto-generated ID
+      const docRef = firestore.collection("ygo_cards").doc();
       const data = {
         cardSet: row.Card_Set,
         cardName: row.Card_Name,
@@ -42,14 +42,12 @@ fs.createReadStream("./script/ygo_card_price_data.csv")
       count++;
 
       if (count % 500 === 0) {
-        // Firestore batch write limit is 500 operations
         await batch.commit();
         console.log(`Committed batch of 500 documents (total: ${count})`);
         batch = firestore.batch();
       }
     }
 
-    // Commit remaining documents
     if (count % 500 !== 0) {
       await batch.commit();
       console.log(`Committed final batch of ${count % 500} documents`);

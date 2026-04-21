@@ -60,11 +60,9 @@ for game in games:
         PRICECHARTING_BASE_URL + link["href"] for link in set_links
     ))
 
-    # Exclude based on patterns
     for pattern in game["exclude_patterns"]:
         set_urls = [url for url in set_urls if pattern not in url.lower()]
 
-    # Limit the number of sets
     set_urls = set_urls[:game["max_sets"]]
 
     card_records = []
